@@ -8,6 +8,13 @@ Typescript implementation for https://github.com/mikeobank/vanice
 deno run src/index.ts { vanity name }
 ```
 
+## Development
+
+```
+deno lint
+deno test
+```
+
 ## To Do
 - linting
 - testing
