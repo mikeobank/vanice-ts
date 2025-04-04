@@ -7,9 +7,17 @@ import isVanity from "./lib/isVanity.ts"
 (async () => {
 
   // CLI arg
-  const vanity = Deno.args[0]
+  if (Deno.args[0] === undefined) {
+    console.error("No vanity name provided")
+    Deno.exit()
+  }
+  const vanity = Deno.args[0].trim()
+  if (vanity === "") {
+    console.error("Empty vanity name provided")
+    Deno.exit()
+  }
   if (isVanity(vanity) === false) {
-    console.error(`Invalid characters in vanity name: ${ vanity }`)
+    console.error(`Invalid characters in vanity name provided: ${ vanity }`)
     Deno.exit()
   }
 
