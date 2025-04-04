@@ -5,7 +5,14 @@ Typescript implementation for https://github.com/mikeobank/vanice
 ## Run
 
 ```
-deno run src/index.ts { vanity name }
+./vanice { vanity name }
+deno run src/main.ts { vanity name }
+```
+
+## Compile
+
+```
+deno compile --output vanice src/main.ts
 ```
 
 ## Development
@@ -16,6 +23,7 @@ deno test
 ```
 
 ## To Do
+
 - linting
 - testing
 - multi threading
