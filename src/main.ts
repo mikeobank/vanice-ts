@@ -33,10 +33,10 @@ import isVanity from "./lib/isVanity.ts"
   let primeKey: PrimeKey
   let i = 0
 
-  // @TODO: Multi-threading, Worker
+  // TODO: Multi-threading, Worker
   while (match === false) {
     [privateKey, publicKey] = generateKeyPair()
-    // @TODO: Only encode first searchLength characters
+    // TODO: Only encode first searchLength characters / bytes
     primeKey = encodeToPrime(publicKey)
     const v = primeKey.substring(0, searchLength)
     if (v === search) {
