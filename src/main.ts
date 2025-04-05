@@ -24,7 +24,7 @@ import isVanity from "./lib/isVanity.ts"
   // Search string
   const search = vanityToPrime(vanity)
   const searchLength = search.length
-  console.log(vanity, search)
+  console.log(`Searching for vanity name: ${ vanity } (${ search })`)
 
   // Looping variables
   let match = false
