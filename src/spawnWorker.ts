@@ -1,30 +1,28 @@
 import { type Prime } from "./lib/toVanityKey.ts"
-
 import { type PrivateKey, type PublicKey } from "./lib/generateKeyPair.ts"
+import { type SuccessMessage, type ProgressMessage } from "./worker.ts"
 
 type Result = {
   privateKey: PrivateKey
   publicKey: PublicKey
 }
 
-type SuccessMessage = {
-  success: true
-  privateKey: PrivateKey
-  publicKey: PublicKey
-}
-
-type ProgressMessage = {
-  success: false
-  totalSearches: number
-}
-
 type WorkerMessage = SuccessMessage | ProgressMessage
 
-export default (num: number, search: Prime) : Promise<Result> => {
+const displayNum = (num: number) => num + 1
 
-  const displayNum = (num: number) => num + 1
+export default (num: number, search: Prime) : [Promise<Result>, () => void] => {
 
-  return new Promise(resolve => {
+  let workerInstance: Worker
+
+  const terminate = () => {
+    if (workerInstance) {
+      console.log(`Terminating worker ${ displayNum(num) }...`)
+      workerInstance.terminate()
+    }
+  }
+
+  return [new Promise((resolve) => {
 
     const spawnNewWorker = () => {
 
@@ -34,11 +32,11 @@ export default (num: number, search: Prime) : Promise<Result> => {
       )
 
       worker.onerror = (error) => {
-        console.error(`Worker ${ num } crashed:`, error)
-        worker.terminate()
+        console.error(`Worker ${ displayNum(num) } crashed:`, error)
+        terminate()
         setTimeout(() => {
-          console.log(`Respawning worker ${ num }...`)
-          spawnNewWorker()
+          console.log(`Respawning worker ${ displayNum(num) }...`)
+          workerInstance = spawnNewWorker()
         }, 1000)
       }
 
@@ -62,9 +60,8 @@ export default (num: number, search: Prime) : Promise<Result> => {
           const { privateKey, publicKey } = event.data as SuccessMessage
           resolve({
             privateKey,
-            publicKey
+            publicKey,
           })
-          worker.terminate()
         } else {
           const { totalSearches } = event.data as ProgressMessage
           logProgress(totalSearches)
@@ -75,6 +72,6 @@ export default (num: number, search: Prime) : Promise<Result> => {
       return worker
     }
 
-    spawnNewWorker()
-  })
+    workerInstance = spawnNewWorker()
+  }), terminate]
 }

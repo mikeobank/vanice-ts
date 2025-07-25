@@ -1,5 +1,5 @@
 import encodeToPrime from "./lib/encodeToPrime.ts"
-import generateKeyPair, { type PrivateKey, PublicKey } from "./lib/generateKeyPair.ts"
+import generateKeyPair, { type PrivateKey, type PublicKey } from "./lib/generateKeyPair.ts"
 
 export type SuccessMessage = {
   success: true
@@ -7,8 +7,9 @@ export type SuccessMessage = {
   publicKey: PublicKey
 }
 
-export type FailureMessage = {
+export type ProgressMessage = {
   success: false
+  totalSearches: number
 }
 
 const worker = self as unknown as Worker
