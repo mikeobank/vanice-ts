@@ -20,12 +20,10 @@ worker.onmessage = (event: MessageEvent) => {
   const searchLength = search.length
 
   let match = false
-  let privateKey: PrivateKey
-  let publicKey: PublicKey
   let totalSearches = 0
 
   while (match === false) {
-    [privateKey, publicKey] = generateKeyPair() 
+    const [privateKey, publicKey] = generateKeyPair() 
     // TODO: Only encode first searchLength characters / bytes
     const primeKey = encodeToPrime(publicKey)
     const value = primeKey.substring(0, searchLength)
