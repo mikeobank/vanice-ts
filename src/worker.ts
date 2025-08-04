@@ -1,4 +1,4 @@
-import encodeToPrime from "./lib/encodeToPrime.ts"
+import { encodeToPrimekey } from "./lib/encodeToPrime.ts"
 import generateKeyPair, { type PrivateKey, type PublicKey } from "./lib/generateKeyPair.ts"
 
 export type SuccessMessage = {
@@ -23,9 +23,9 @@ worker.onmessage = (event: MessageEvent) => {
   let totalSearches = 0
 
   while (match === false) {
-    const [privateKey, publicKey] = generateKeyPair() 
+    const [publicKey, privateKey] = generateKeyPair() 
     // TODO: Only encode first searchLength characters / bytes
-    const primeKey = encodeToPrime(publicKey)
+    const primeKey = encodeToPrimekey(publicKey)
     const value = primeKey.substring(0, searchLength)
     if (value === search) {
       worker.postMessage({

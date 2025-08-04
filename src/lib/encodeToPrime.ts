@@ -10,7 +10,12 @@ const crockford2Vanice = (crockford: string) : PrimeKey => {
     .replace(/Z/g, "Y")
 }
 
-export default (arr: Uint8Array) : PrimeKey => {
+export const encodeToPrime = (arr: Uint8Array) : PrimeKey => {
   return crockford2Vanice(base32crockford.encode(arr))
 }
 
+export const encodeToPrimekey = (arr: Uint8Array) : PrimeKey => {
+  const flag = arr[0]
+  const primeKey = encodeToPrime(arr.subarray(1))
+  return `${ primeKey }${ flag }`
+}

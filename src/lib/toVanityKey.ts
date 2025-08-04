@@ -1,4 +1,4 @@
-import encodeToPrime from "./encodeToPrime.ts"
+import { encodeToPrime } from "./encodeToPrime.ts"
 import isPrime from "./isPrime.ts"
 import isVanity from "./isVanity.ts"
 import toEmojis from "./toEmojis.ts"
@@ -25,4 +25,9 @@ export default async (vanity: VanityName, primeKey: PrimeKey, emojiLength?: numb
   const prime = encodeToPrime(await hashPrimeKey(primeKey))
   const emojis = toEmojis(prime.substring(0, l))
   return `${ vanity }${ emojis }`
+}
+
+export const primeKeyToEmojis = async (primeKey: PrimeKey) : Promise<Emojis> => {
+  const prime = encodeToPrime(await hashPrimeKey(primeKey))
+  return toEmojis(prime)
 }

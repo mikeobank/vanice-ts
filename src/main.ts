@@ -1,6 +1,6 @@
 import vanityToPrime from "./lib/vanityToPrime.ts"
-import encodeToPrime from "./lib/encodeToPrime.ts"
-import toVanityKey from "./lib/toVanityKey.ts"
+import { encodeToPrimekey } from "./lib/encodeToPrime.ts"
+import toVanityKey, { primeKeyToEmojis } from "./lib/toVanityKey.ts"
 import isVanity from "./lib/isVanity.ts"
 import createWorkerPool from "./pool.ts"
 
@@ -24,8 +24,9 @@ const search = vanityToPrime(vanity)
 console.log(`Searching for vanity name: ${ vanity } (${ search })`)
 
 const { privateKey, publicKey } = await createWorkerPool(search)
-const primeKey = encodeToPrime(publicKey)
+const primeKey = encodeToPrimekey(publicKey)
 console.log("private key:", privateKey)
 console.log("public key:", publicKey)
-console.log(primeKey)
-console.log(await toVanityKey(vanity, primeKey))
+console.log("vanity name:", await toVanityKey(vanity, primeKey))
+console.log("primary key:", primeKey)
+console.log("fingerprint:", await primeKeyToEmojis(primeKey))
