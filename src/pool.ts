@@ -1,5 +1,4 @@
-import { type Prime } from "./lib/toVanityKey.ts"
-import { type PrivateKey, type PublicKey } from "./lib/generateKeyPair.ts"
+import { type PrimaryChars, type PrivateKey, type PublicKey } from "@vanice/types"
 import spawnWorker from "./spawnWorker.ts"
 
 type Result = {
@@ -8,7 +7,7 @@ type Result = {
 }
 
 
-export default (search: Prime, numWorkers = 8): Promise<Result> => {
+export default (primaryName: PrimaryChars, numWorkers = 8): Promise<Result> => {
   const promises: Promise<Result>[] = []
   const terminationMethods: (() => void)[] = []
 
@@ -17,7 +16,7 @@ export default (search: Prime, numWorkers = 8): Promise<Result> => {
   }
 
   for (let i = 0; i < numWorkers; i++) {
-    const [promise, terminationMethod] = spawnWorker(i, search)
+    const [promise, terminationMethod] = spawnWorker(i, primaryName)
     promises.push(promise)
     terminationMethods.push(terminationMethod)
   }

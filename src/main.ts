@@ -1,7 +1,4 @@
-import vanityToPrime from "./lib/vanityToPrime.ts"
-import { encodeToPrimekey } from "./lib/encodeToPrime.ts"
-import toVanityKey, { primeKeyToEmojis } from "./lib/toVanityKey.ts"
-import isVanity from "./lib/isVanity.ts"
+import { isName, toPrimaryChars, publicKeyToPrimaryKey, primaryKeyToFingerprintedName, primaryKeyToFingerprint } from "@vanice/types"
 import createWorkerPool from "./pool.ts"
 
 // CLI arg
@@ -9,24 +6,24 @@ if (Deno.args[0] === undefined) {
   console.error("No vanity name provided")
   Deno.exit()
 }
-const vanity = Deno.args[0].trim()
-if (vanity === "") {
+const name = Deno.args[0].trim()
+if (name === "") {
   console.error("Empty vanity name provided")
   Deno.exit()
 }
-if (isVanity(vanity) === false) {
-  console.error(`Invalid characters in vanity name provided: ${ vanity }`)
+if (isName(name) === false) {
+  console.error(`Invalid characters in chosen name: ${ name }`)
   Deno.exit()
 }
 
 // Search string
-const search = vanityToPrime(vanity)
-console.log(`Searching for vanity name: ${ vanity } (${ search })`)
+const primaryName = toPrimaryChars(name)
+console.log(`Searching for name: ${ name } (${ primaryName })`)
 
-const { privateKey, publicKey } = await createWorkerPool(search)
-const primeKey = encodeToPrimekey(publicKey)
+const { privateKey, publicKey } = await createWorkerPool(primaryName)
+const primaryKey = publicKeyToPrimaryKey(publicKey)
 console.log("private key:", privateKey)
 console.log("public key:", publicKey)
-console.log("vanity name:", await toVanityKey(vanity, primeKey))
-console.log("primary key:", primeKey)
-console.log("fingerprint:", await primeKeyToEmojis(primeKey))
+console.log("primary key:", primaryKey)
+console.log("name:", await primaryKeyToFingerprintedName(primaryKey, name))
+console.log("fingerprint:", await primaryKeyToFingerprint(primaryKey))

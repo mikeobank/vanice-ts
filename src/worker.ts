@@ -1,5 +1,4 @@
-import { encodeToPrimekey } from "./lib/encodeToPrime.ts"
-import generateKeyPair, { type PrivateKey, type PublicKey } from "./lib/generateKeyPair.ts"
+import { type PrivateKey, type PublicKey, publicKeyToPrimaryKey, generateKeyPair } from "@vanice/types"
 
 export type SuccessMessage = {
   success: true
@@ -24,9 +23,8 @@ worker.onmessage = (event: MessageEvent) => {
 
   while (match === false) {
     const [publicKey, privateKey] = generateKeyPair() 
-    // TODO: Only encode first searchLength characters / bytes
-    const primeKey = encodeToPrimekey(publicKey)
-    const value = primeKey.substring(0, searchLength)
+    const primaryKey = publicKeyToPrimaryKey(publicKey)
+    const value = primaryKey.substring(0, searchLength)
     if (value === search) {
       worker.postMessage({
         success: true,

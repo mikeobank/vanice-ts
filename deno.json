@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@vanice/types": "jsr:@vanice/types@^0.1.3"
+  }
+}

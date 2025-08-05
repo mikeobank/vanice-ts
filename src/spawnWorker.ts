@@ -1,5 +1,4 @@
-import { type Prime } from "./lib/toVanityKey.ts"
-import { type PrivateKey, type PublicKey } from "./lib/generateKeyPair.ts"
+import { type PrimaryChars, type PrivateKey, type PublicKey } from "@vanice/types"
 import { type SuccessMessage, type ProgressMessage } from "./worker.ts"
 
 type Result = {
@@ -11,7 +10,7 @@ type WorkerMessage = SuccessMessage | ProgressMessage
 
 const displayNum = (num: number) => num + 1
 
-export default (num: number, search: Prime) : [Promise<Result>, () => void] => {
+export default (num: number, search: PrimaryChars) : [Promise<Result>, () => void] => {
 
   let workerInstance: Worker
 
