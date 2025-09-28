@@ -1,5 +1,5 @@
 import { isName, toPrimaryChars, publicKeyToPrimaryKey, primaryKeyToFingerprintedName, primaryKeyToFingerprint } from "@vanice/types"
-import createWorkerPool from "./pool.ts"
+import createWorkerPool from "./createWorkerPool.ts"
 
 // CLI arg
 if (Deno.args[0] === undefined) {
