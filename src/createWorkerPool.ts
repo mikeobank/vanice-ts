@@ -22,11 +22,13 @@ export default (primaryName: PrimaryChars, numWorkers = 8): Promise<Result> => {
   }
 
   // Clean up workers on process exit
-  Deno.addSignalListener("SIGINT", () => {
-    console.log("Terminating all workers...")
-    terminateAll()
-    Deno.exit()
-  })
+  if (Deno !== undefined) {
+    Deno.addSignalListener("SIGINT", () => {
+      console.log("Terminating all workers...")
+      terminateAll()
+      Deno.exit()
+    })
+  }
 
   return Promise.race(promises).then(result => {
     // Terminate all other workers
