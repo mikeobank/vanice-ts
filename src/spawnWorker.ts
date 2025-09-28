@@ -1,5 +1,6 @@
-import { type PrimaryChars, type PrivateKey, type PublicKey } from "@vanice/types"
-import { type SuccessMessage, type ProgressMessage } from "./worker.ts"
+import type { PrimaryChars, PrivateKey, PublicKey } from "@vanice/types"
+import type { SuccessMessage, ProgressMessage } from "./worker.ts"
+import isDeno from "./lib/isDeno.ts"
 
 type Result = {
   privateKey: PrivateKey
@@ -9,6 +10,8 @@ type Result = {
 type WorkerMessage = SuccessMessage | ProgressMessage
 
 const displayNum = (num: number) => num + 1
+
+const url = new URL(isDeno ? "./worker.ts" : "/worker.js", import.meta.url)
 
 export default (num: number, search: PrimaryChars) : [Promise<Result>, () => void] => {
 
@@ -26,7 +29,7 @@ export default (num: number, search: PrimaryChars) : [Promise<Result>, () => voi
     const spawnNewWorker = () => {
 
       const worker = new Worker(
-        new URL("./worker.ts", import.meta.url).href,
+        url.href,
         { type: "module" }
       )
 

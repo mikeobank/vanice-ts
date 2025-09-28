@@ -1,11 +1,11 @@
-import { type PrimaryChars, type PrivateKey, type PublicKey } from "@vanice/types"
+import type { PrimaryChars, PrivateKey, PublicKey } from "@vanice/types"
 import spawnWorker from "./spawnWorker.ts"
+import isDeno from "./lib/isDeno.ts"
 
 type Result = {
   privateKey: PrivateKey
   publicKey: PublicKey
 }
-
 
 export default (primaryName: PrimaryChars, numWorkers = 8): Promise<Result> => {
   const promises: Promise<Result>[] = []
@@ -22,7 +22,7 @@ export default (primaryName: PrimaryChars, numWorkers = 8): Promise<Result> => {
   }
 
   // Clean up workers on process exit
-  if (typeof Deno !== "undefined") {
+  if (isDeno) {
     Deno.addSignalListener("SIGINT", () => {
       console.log("Terminating all workers...")
       terminateAll()
