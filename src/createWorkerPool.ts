@@ -22,7 +22,7 @@ export default (primaryName: PrimaryChars, numWorkers = 8): Promise<Result> => {
   }
 
   // Clean up workers on process exit
-  if (Deno !== undefined) {
+  if (typeof Deno !== "undefined") {
     Deno.addSignalListener("SIGINT", () => {
       console.log("Terminating all workers...")
       terminateAll()
