@@ -15,6 +15,11 @@ deno run --allow-read src/main.ts { vanity name }
 ./vanice { vanity name }
 ```
 
+## Build worker.js browser file
+```
+deno bundle src/worker.ts --outdir dist
+```
+
 ## Development
 
 ```
