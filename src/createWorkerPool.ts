@@ -7,7 +7,7 @@ type Result = {
   publicKey: PublicKey
 }
 
-export default (primaryName: PrimaryChars, numWorkers = 8): Promise<Result> => {
+export default (primaryName: PrimaryChars, numWorkers = 8, url?: URL): Promise<Result> => {
   const promises: Promise<Result>[] = []
   const terminationMethods: (() => void)[] = []
 
@@ -16,7 +16,7 @@ export default (primaryName: PrimaryChars, numWorkers = 8): Promise<Result> => {
   }
 
   for (let i = 0; i < numWorkers; i++) {
-    const [promise, terminationMethod] = spawnWorker(i, primaryName)
+    const [promise, terminationMethod] = spawnWorker(i, primaryName, url)
     promises.push(promise)
     terminationMethods.push(terminationMethod)
   }

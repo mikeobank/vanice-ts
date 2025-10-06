@@ -11,9 +11,9 @@ type WorkerMessage = SuccessMessage | ProgressMessage
 
 const displayNum = (num: number) => num + 1
 
-const url = new URL(isDeno ? "./worker.ts" : "/worker.js", import.meta.url)
+const defaultUrl = new URL(isDeno ? "./worker.ts" : "/worker.js", import.meta.url)
 
-export default (num: number, search: PrimaryChars) : [Promise<Result>, () => void] => {
+export default (num: number, search: PrimaryChars, url: URL = defaultUrl) : [Promise<Result>, () => void] => {
 
   let workerInstance: Worker
 
