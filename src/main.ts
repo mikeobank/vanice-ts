@@ -1,4 +1,4 @@
-import { isName, toPrimaryChars, publicKeyToPrimaryKey, primaryKeyToFingerprintedName, primaryKeyToFingerprint } from "@vanice/types"
+import { isName, toPrimaryName, publicKeyToPrimaryKey, primaryKeyToFingerprintedName, primaryKeyToFingerprint, displayFingerprint } from "@vanice/types"
 import createWorkerPool from "./createWorkerPool.ts"
 
 // CLI arg
@@ -17,7 +17,7 @@ if (isName(name) === false) {
 }
 
 // Search string
-const primaryName = toPrimaryChars(name)
+const primaryName = toPrimaryName(name)
 console.log(`Searching for name: ${ name } (${ primaryName })`)
 
 const { privateKey, publicKey } = await createWorkerPool(primaryName)
@@ -26,4 +26,4 @@ console.log("private key:", privateKey)
 console.log("public key:", publicKey)
 console.log("primary key:", primaryKey)
 console.log("name:", await primaryKeyToFingerprintedName(primaryKey, name))
-console.log("fingerprint:", await primaryKeyToFingerprint(primaryKey))
+console.log("fingerprint:", displayFingerprint(await primaryKeyToFingerprint(primaryKey)))
