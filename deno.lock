@@ -3,7 +3,7 @@
   "specifiers": {
     "jsr:@noble/hashes@^1.8.0": "1.8.0",
     "jsr:@noble/secp256k1@^2.3.0": "2.3.0",
-    "jsr:@vanice/types@~0.1.6": "0.1.6"
+    "jsr:@vanice/types@~0.1.9": "0.1.9"
   },
   "jsr": {
     "@noble/hashes@1.8.0": {
@@ -12,8 +12,8 @@
     "@noble/secp256k1@2.3.0": {
       "integrity": "63eb4479a7c548e0ddea1cb5ea9bf7efacafe495e7f1c07bce1b4108df95967f"
     },
-    "@vanice/types@0.1.6": {
-      "integrity": "7981854a993cd6281ec6411a32d5df2eae9253648084eff5102fd9a07b23d96e",
+    "@vanice/types@0.1.9": {
+      "integrity": "d125f6b4ffbd9db40df1771a703e38cf626e4b16d898669f3683cc68bd3689eb",
       "dependencies": [
         "jsr:@noble/hashes",
         "jsr:@noble/secp256k1"
@@ -22,7 +22,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@vanice/types@~0.1.6"
+      "jsr:@vanice/types@~0.1.9"
     ]
   }
 }
