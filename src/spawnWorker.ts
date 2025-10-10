@@ -1,5 +1,6 @@
 import type { PrimaryChars, PrivateKey, PublicKey } from "@vanice/types"
 import type { SuccessMessage, ProgressMessage } from "./worker.ts"
+import type { WorkerStatus } from "./Status.ts"
 import isDeno from "./lib/isDeno.ts"
 
 type Result = {
@@ -7,24 +8,39 @@ type Result = {
   publicKey: PublicKey
 }
 
+export type WorkerId = number
 type WorkerMessage = SuccessMessage | ProgressMessage
+
+type StatusChangeCallback = (status: WorkerStatus) => void
 
 const displayNum = (num: number) => num + 1
 
 const defaultUrl = new URL(isDeno ? "./worker.ts" : "/worker.js", import.meta.url)
 
-export default (num: number, search: PrimaryChars, url: URL = defaultUrl) : [Promise<Result>, () => void] => {
+export default (
+  id: WorkerStatus["workerId"], 
+  search: PrimaryChars, 
+  url: URL = defaultUrl,
+  onStatusChange: StatusChangeCallback
+) : [WorkerStatus, Promise<Result>, () => void] => {
+
+  const status: WorkerStatus = {
+    workerId: id,
+    errors: [],
+    start: Date.now(),
+    attempts: 0
+  }
 
   let workerInstance: Worker
 
   const terminate = () => {
     if (workerInstance) {
-      console.log(`Terminating worker ${ displayNum(num) }...`)
+      console.log(`Terminating worker ${ displayNum(id) }...`)
       workerInstance.terminate()
     }
   }
 
-  return [new Promise((resolve) => {
+  return [status, new Promise((resolve) => {
 
     const spawnNewWorker = () => {
 
@@ -34,26 +50,12 @@ export default (num: number, search: PrimaryChars, url: URL = defaultUrl) : [Pro
       )
 
       worker.onerror = (error) => {
-        console.error(`Worker ${ displayNum(num) } crashed:`, error)
+        status.errors.push({ datetime: Date.now(), error })
+        onStatusChange(status)
         terminate()
         setTimeout(() => {
-          console.log(`Respawning worker ${ displayNum(num) }...`)
           workerInstance = spawnNewWorker()
         }, 1000)
-      }
-
-      // Logging variables outside to persist between respawns
-      let lastTotalSearches = 0
-      let lastLog = Date.now()
-
-      const logProgress = (totalSearches: number) => {
-        // Log guesses per minute
-        const now = Date.now()
-        if (now - lastLog >= 60000) {
-          console.log(`Worker: ${ displayNum(num) }. Searches in last minute: ${ totalSearches - lastTotalSearches }`)
-          lastLog = now
-          lastTotalSearches = totalSearches
-        }
       }
 
       worker.onmessage = (event: MessageEvent) => {
@@ -66,11 +68,12 @@ export default (num: number, search: PrimaryChars, url: URL = defaultUrl) : [Pro
           })
         } else {
           const { totalSearches } = event.data as ProgressMessage
-          logProgress(totalSearches)
+          status.attempts = totalSearches
+          onStatusChange(status)
         }
       }
 
-      worker.postMessage({ num, search })
+      worker.postMessage({ search })
       return worker
     }
 

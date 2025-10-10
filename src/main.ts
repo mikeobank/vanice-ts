@@ -20,7 +20,12 @@ if (isName(name) === false) {
 const primaryName = toPrimaryName(name)
 console.log(`Searching for name: ${ name } (${ primaryName })`)
 
-const { privateKey, publicKey } = await createWorkerPool(primaryName)
+const { privateKey, publicKey } = await createWorkerPool(
+  primaryName, 
+  undefined, 
+  undefined, 
+  workerPoolStatus => { console.log(`${ workerPoolStatus.totalAttempts } guesses (${ workerPoolStatus.attemptsPerSecond }/second)`) }
+)
 const primaryKey = publicKeyToPrimaryKey(publicKey)
 console.log("private key:", privateKey)
 console.log("private key hex:", displayHex(privateKey))
