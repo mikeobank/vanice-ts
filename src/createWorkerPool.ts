@@ -1,4 +1,4 @@
-import type { PrimaryChars, PrivateKey, PublicKey } from "@vanice/types"
+import type { PrimaryChars, PublicKey, PrivateKey, CryptoName } from "@vanice/types"
 import spawnWorker from "./spawnWorker.ts"
 import isDeno from "./lib/isDeno.ts"
 import { createWorkerPoolStatus, updateWorkerPoolStatus, type WorkerPoolStatus, type WorkerStatus } from "./Status.ts"
@@ -12,6 +12,7 @@ type Result = {
 type WorkerPoolStatusChangeCallback = (status: WorkerPoolStatus) => void
 
 export default (
+  cryptoName: CryptoName,
   primaryName: PrimaryChars, 
   numWorkers = 8, 
   url?: URL,
@@ -35,7 +36,7 @@ export default (
       throttledOnWorkerPoolStatusChange?.(workerPoolStatus)
     }
     
-    const [status, promise, terminationMethod] = spawnWorker(i, primaryName, url, statusChangeCallback)
+    const [status, promise, terminationMethod] = spawnWorker(cryptoName, i, primaryName, url, statusChangeCallback)
     workerPoolStatus.workers.push(status)
     promises.push(promise)
     terminationMethods.push(terminationMethod)

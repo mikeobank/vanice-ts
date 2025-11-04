@@ -13,17 +13,17 @@ export type ProgressMessage = {
 
 const worker = self as unknown as Worker
 
-worker.onmessage = (event: MessageEvent) => {
+worker.onmessage = async (event: MessageEvent) => {
 
-  const { search } = event.data
+  const { search, cryptoName } = event.data
   const searchLength = search.length
 
   let match = false
   let totalSearches = 0
 
   while (match === false) {
-    const [publicKey, privateKey] = generateKeyPair() 
-    const primaryKey = publicKeyToPrimaryKey(publicKey)
+    const { publicKey, privateKey } = await generateKeyPair(cryptoName) 
+    const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
     const value = primaryKey.substring(0, searchLength)
     if (value === search) {
       worker.postMessage({

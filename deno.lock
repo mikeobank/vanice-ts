@@ -1,20 +1,25 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@noble/ed25519@3": "3.0.0",
     "jsr:@noble/hashes@^1.8.0": "1.8.0",
-    "jsr:@noble/secp256k1@^2.3.0": "2.3.0",
-    "jsr:@vanice/types@~0.1.9": "0.1.9"
+    "jsr:@noble/secp256k1@3": "3.0.0",
+    "jsr:@vanice/types@0.2.0-alpha.2": "0.2.0-alpha.2"
   },
   "jsr": {
+    "@noble/ed25519@3.0.0": {
+      "integrity": "cf3cc8022e0ab17649af2064be922b9653af8a2bbe695bd02f88317746dc619e"
+    },
     "@noble/hashes@1.8.0": {
       "integrity": "b52a2fcb4d02f8d8137871564a31f1ee9e2b0d15eedabbf32d2f7333f0abc939"
     },
-    "@noble/secp256k1@2.3.0": {
-      "integrity": "63eb4479a7c548e0ddea1cb5ea9bf7efacafe495e7f1c07bce1b4108df95967f"
+    "@noble/secp256k1@3.0.0": {
+      "integrity": "8d1639a9c06fcffacf720d8319e8e996e9fbfbaf868324e4cec5dc56b2ade1b9"
     },
-    "@vanice/types@0.1.9": {
-      "integrity": "d125f6b4ffbd9db40df1771a703e38cf626e4b16d898669f3683cc68bd3689eb",
+    "@vanice/types@0.2.0-alpha.2": {
+      "integrity": "c29873021691465c722ddb16b4fe98c5708596044496c0e29dcb61ab129aa9ea",
       "dependencies": [
+        "jsr:@noble/ed25519",
         "jsr:@noble/hashes",
         "jsr:@noble/secp256k1"
       ]
@@ -22,7 +27,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@vanice/types@~0.1.9"
+      "jsr:@vanice/types@0.2.0-alpha.2"
     ]
   }
 }

@@ -1,4 +1,4 @@
-import type { PrimaryChars, PrivateKey, PublicKey } from "@vanice/types"
+import type { PrimaryChars, PrivateKey, PublicKey, CryptoName } from "@vanice/types"
 import type { SuccessMessage, ProgressMessage } from "./worker.ts"
 import type { WorkerStatus } from "./Status.ts"
 import isDeno from "./lib/isDeno.ts"
@@ -18,6 +18,7 @@ const displayNum = (num: number) => num + 1
 const defaultUrl = new URL(isDeno ? "./worker.ts" : "/worker.js", import.meta.url)
 
 export default (
+  cryptoName: CryptoName,
   id: WorkerStatus["workerId"], 
   search: PrimaryChars, 
   url: URL = defaultUrl,
@@ -73,7 +74,7 @@ export default (
         }
       }
 
-      worker.postMessage({ search })
+      worker.postMessage({ cryptoName, search })
       return worker
     }
 
