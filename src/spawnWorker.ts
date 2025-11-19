@@ -1,11 +1,13 @@
-import type { PrimaryChars, PrivateKey, PublicKey, CryptoName } from "@vanice/types"
+import type { PrimaryChars, PrivateKey, PublicKey, CryptoName, XPub } from "@vanice/types"
 import type { SuccessMessage, ProgressMessage } from "./worker.ts"
 import type { WorkerStatus } from "./Status.ts"
 import isDeno from "./lib/isDeno.ts"
 
-type Result = {
-  privateKey: PrivateKey
+export type Result = {
   publicKey: PublicKey
+  privateKey?: PrivateKey
+  xPub?: XPub
+  index?: number
 }
 
 export type WorkerId = number
@@ -17,12 +19,15 @@ const displayNum = (num: number) => num + 1
 
 const defaultUrl = new URL(isDeno ? "./worker.ts" : "/worker.js", import.meta.url)
 
-export default (
+export const spawnWorker = (
   cryptoName: CryptoName,
   id: WorkerStatus["workerId"], 
   search: PrimaryChars, 
   url: URL = defaultUrl,
-  onStatusChange: StatusChangeCallback
+  onStatusChange: StatusChangeCallback,
+  xPub?: XPub,
+  offset?: number,
+  maxAttempts?: number
 ) : [WorkerStatus, Promise<Result>, () => void] => {
 
   const status: WorkerStatus = {
@@ -41,7 +46,7 @@ export default (
     }
   }
 
-  return [status, new Promise((resolve) => {
+  return [status, new Promise((resolve, reject) => {
 
     const spawnNewWorker = () => {
 
@@ -62,19 +67,31 @@ export default (
       worker.onmessage = (event: MessageEvent) => {
         const { success } = event.data as WorkerMessage
         if (success) {
-          const { privateKey, publicKey } = event.data as SuccessMessage
-          resolve({
-            privateKey,
-            publicKey,
-          })
+          const { privateKey, publicKey, xPub, index } = event.data as SuccessMessage
+          if (privateKey !== undefined) {
+            resolve({
+              privateKey,
+              publicKey,
+            })
+          } else if (xPub !== undefined && index !== undefined) {
+            resolve({
+              publicKey,
+              xPub,
+              index
+            })
+          }
         } else {
-          const { totalSearches } = event.data as ProgressMessage
-          status.attempts = totalSearches
+          if ("maxAttemptsReached" in event.data) {
+            terminate()
+            reject(new Error(`Worker ${ displayNum(id) } reached max attempts without finding a match.`))
+          }
+          const { totalAttempts } = event.data as ProgressMessage
+          status.attempts = totalAttempts
           onStatusChange(status)
         }
       }
 
-      worker.postMessage({ cryptoName, search })
+      worker.postMessage({ cryptoName, search, xPub, offset, maxAttempts })
       return worker
     }
 

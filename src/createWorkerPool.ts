@@ -1,13 +1,8 @@
-import type { PrimaryChars, PublicKey, PrivateKey, CryptoName } from "@vanice/types"
-import spawnWorker from "./spawnWorker.ts"
-import isDeno from "./lib/isDeno.ts"
-import { createWorkerPoolStatus, updateWorkerPoolStatus, type WorkerPoolStatus, type WorkerStatus } from "./Status.ts"
+import type { PrimaryChars, CryptoName, XPub } from "@vanice/types"
+import { type Result, spawnWorker } from "./spawnWorker.ts"
+import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
 import throttle from "./lib/throttle.ts"
-
-type Result = {
-  privateKey: PrivateKey
-  publicKey: PublicKey
-}
+import isDeno from "./lib/isDeno.ts"
 
 type WorkerPoolStatusChangeCallback = (status: WorkerPoolStatus) => void
 
@@ -16,8 +11,9 @@ export default (
   primaryName: PrimaryChars, 
   numWorkers = 8, 
   url?: URL,
+  xPub?: XPub,
   onWorkerPoolStatusChange?: WorkerPoolStatusChangeCallback,
-  throttleLimit = 1000
+  throttleLimit = 1000,
 ): Promise<Result> => {
 
   const promises: Promise<Result>[] = []
@@ -30,13 +26,19 @@ export default (
 
   const throttledOnWorkerPoolStatusChange = onWorkerPoolStatusChange ? throttle(onWorkerPoolStatusChange, throttleLimit) : undefined
 
+  const statusChangeCallback = (status: WorkerStatus) => {
+    updateWorkerPoolStatus(workerPoolStatus, status)
+    throttledOnWorkerPoolStatusChange?.(workerPoolStatus)
+  }
+
+  const totalAttempts = 2 ** 32 - 1
+  const maxAttemptsPerWorker = Math.ceil(totalAttempts / numWorkers)
+
   for (let i = 0; i < numWorkers; i++) {
-    const statusChangeCallback = (status: WorkerStatus) => {
-      updateWorkerPoolStatus(workerPoolStatus, status)
-      throttledOnWorkerPoolStatusChange?.(workerPoolStatus)
-    }
+
+    const offset = i * maxAttemptsPerWorker
     
-    const [status, promise, terminationMethod] = spawnWorker(cryptoName, i, primaryName, url, statusChangeCallback)
+    const [status, promise, terminationMethod] = spawnWorker(cryptoName, i, primaryName, url, statusChangeCallback, xPub, maxAttemptsPerWorker, offset)
     workerPoolStatus.workers.push(status)
     promises.push(promise)
     terminationMethods.push(terminationMethod)
@@ -51,7 +53,7 @@ export default (
     })
   }
 
-  return Promise.race(promises).then(result => {
+  return Promise.any(promises).then(result => {
     // Terminate all other workers
     terminateAll()
     return result
