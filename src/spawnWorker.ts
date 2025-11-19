@@ -1,4 +1,4 @@
-import type { PrimaryChars, PrivateKey, PublicKey, CryptoName, XPub } from "@vanice/types"
+import type { PrimaryChars, PrivateKey, PublicKey, CryptoName, Mnemonic, XPub } from "@vanice/types"
 import type { SuccessMessage, ProgressMessage } from "./worker.ts"
 import type { WorkerStatus } from "./Status.ts"
 import isDeno from "./lib/isDeno.ts"
@@ -6,6 +6,7 @@ import isDeno from "./lib/isDeno.ts"
 export type Result = {
   publicKey: PublicKey
   privateKey?: PrivateKey
+  mnemonic?: Mnemonic
   xPub?: XPub
   index?: number
 }
@@ -25,6 +26,7 @@ export const spawnWorker = (
   search: PrimaryChars, 
   url: URL = defaultUrl,
   onStatusChange: StatusChangeCallback,
+  shouldGenerateMnemonic = false,
   xPub?: XPub,
   offset?: number,
   maxAttempts?: number
@@ -67,11 +69,12 @@ export const spawnWorker = (
       worker.onmessage = (event: MessageEvent) => {
         const { success } = event.data as WorkerMessage
         if (success) {
-          const { privateKey, publicKey, xPub, index } = event.data as SuccessMessage
+          const { privateKey, publicKey, mnemonic, xPub, index } = event.data as SuccessMessage
           if (privateKey !== undefined) {
             resolve({
               privateKey,
               publicKey,
+              mnemonic
             })
           } else if (xPub !== undefined && index !== undefined) {
             resolve({
@@ -91,7 +94,7 @@ export const spawnWorker = (
         }
       }
 
-      worker.postMessage({ cryptoName, search, xPub, offset, maxAttempts })
+      worker.postMessage({ cryptoName, search, shouldGenerateMnemonic, xPub, offset, maxAttempts })
       return worker
     }
 

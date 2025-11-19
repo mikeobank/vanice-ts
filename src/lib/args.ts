@@ -7,3 +7,7 @@ export const getArgByName = (name: string, args: typeof Deno.args, defaultValue?
   return args.find(arg => arg.startsWith(`--${ name }=`))?.replace(`--${ name }=`, "").trim() ?? defaultValue
 }
 
+export const hasArg = (name: string, args: typeof Deno.args): boolean => {
+  return args.some(arg => arg === `--${ name }`)
+}
+

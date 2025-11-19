@@ -1,10 +1,11 @@
-import { type PrivateKey, type PublicKey, type XPub, publicKeyToPrimaryKey } from "@vanice/types"
+import { type Mnemonic, type PrivateKey, type PublicKey, type XPub, publicKeyToPrimaryKey } from "@vanice/types"
 import { generateKeyPair } from "./generateKeyPair.ts"
 
 export type SuccessMessage = {
   success: true
   publicKey: PublicKey
   privateKey?: PrivateKey
+  mnemonic?: Mnemonic
   xPub?: XPub
   index?: number
 }
@@ -23,7 +24,7 @@ const worker = self as unknown as Worker
 
 worker.onmessage = async (event: MessageEvent) => {
 
-  const { search, cryptoName, xPub, offset, maxAttempts } = event.data
+  const { search, cryptoName, shouldGenerateMnemonic, xPub, offset, maxAttempts } = event.data
   const searchLength = search.length
 
   let match = false
@@ -31,7 +32,7 @@ worker.onmessage = async (event: MessageEvent) => {
 
   while (match === false) {
     const index = offset + totalAttempts 
-    const { publicKey, privateKey } = await generateKeyPair(cryptoName, xPub, offset + totalAttempts) 
+    const { publicKey, privateKey, mnemonic } = await generateKeyPair(cryptoName, shouldGenerateMnemonic, xPub, offset + totalAttempts) 
     const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
     const value = primaryKey.substring(0, searchLength)
     if (value === search) {
@@ -39,6 +40,7 @@ worker.onmessage = async (event: MessageEvent) => {
         success: true,
         privateKey,
         publicKey,
+        mnemonic,
         xPub,
         index
       })

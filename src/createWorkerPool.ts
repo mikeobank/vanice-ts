@@ -11,9 +11,10 @@ export default (
   primaryName: PrimaryChars, 
   numWorkers = 8, 
   url?: URL,
-  xPub?: XPub,
   onWorkerPoolStatusChange?: WorkerPoolStatusChangeCallback,
   throttleLimit = 1000,
+  shouldGenerateMnemonic = false,
+  xPub?: XPub
 ): Promise<Result> => {
 
   const promises: Promise<Result>[] = []
@@ -38,7 +39,17 @@ export default (
 
     const offset = i * maxAttemptsPerWorker
     
-    const [status, promise, terminationMethod] = spawnWorker(cryptoName, i, primaryName, url, statusChangeCallback, xPub, maxAttemptsPerWorker, offset)
+    const [status, promise, terminationMethod] = spawnWorker(
+      cryptoName, 
+      i, 
+      primaryName, 
+      url, 
+      statusChangeCallback, 
+      shouldGenerateMnemonic,
+      xPub, 
+      maxAttemptsPerWorker, 
+      offset
+    )
     workerPoolStatus.workers.push(status)
     promises.push(promise)
     terminationMethods.push(terminationMethod)
