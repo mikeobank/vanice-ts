@@ -1,4 +1,5 @@
 import type { PrimaryChars, CryptoName, XPub } from "@vanice/types"
+import { maxIndex } from "@vanice/types"
 import { type Result, spawnWorker } from "./spawnWorker.ts"
 import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
 import throttle from "./lib/throttle.ts"
@@ -32,7 +33,7 @@ export default (
     throttledOnWorkerPoolStatusChange?.(workerPoolStatus)
   }
 
-  const totalAttempts = 2 ** 32 - 1
+  const totalAttempts = maxIndex 
   const maxAttemptsPerWorker = Math.ceil(totalAttempts / numWorkers)
 
   for (let i = 0; i < numWorkers; i++) {
