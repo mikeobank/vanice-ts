@@ -13,7 +13,6 @@ export type Result = {
 
 export type WorkerId = number
 type WorkerMessage = SuccessMessage | ProgressMessage
-
 type StatusChangeCallback = (status: WorkerStatus) => void
 
 const displayNum = (num: number) => num + 1

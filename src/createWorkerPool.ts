@@ -15,7 +15,7 @@ export default (
   throttleLimit = 1000,
   shouldGenerateMnemonic = false,
   xPub?: XPub
-): Promise<Result> => {
+): Promise<Result | void> => {
 
   const promises: Promise<Result>[] = []
   const terminationMethods: (() => void)[] = []
@@ -68,5 +68,11 @@ export default (
     // Terminate all other workers
     terminateAll()
     return result
+  }).catch(() => {
+    if (xPub !== undefined) {
+      throw new Error("XPub derivation exhausted")
+    } else {
+      throw new Error("All workers failed")
+    }
   })
 }

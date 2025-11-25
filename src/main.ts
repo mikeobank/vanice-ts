@@ -45,30 +45,43 @@ if (xPub !== undefined && isXPub(xPub) === false) {
 const primaryName = toPrimaryName(name)
 console.log(`Searching for name: ${ name } (${ primaryName })`)
 
-const { privateKey, publicKey, mnemonic, index } = await createWorkerPool(
-  cryptoName,
-  primaryName, 
-  undefined, 
-  undefined, 
-  workerPoolStatus => { console.log(`${ workerPoolStatus.totalAttempts } guesses (${ workerPoolStatus.attemptsPerSecond }/second)`) },
-  undefined,
-  shouldGenerateMnemonic,
-  xPub
-)
-const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
-if (privateKey !== undefined) {
-  console.log(`private key (${ cryptoName }):`, privateKey)
-  console.log("private key hex:", displayPrivateKey(cryptoName, privateKey))
-  if (mnemonic !== undefined) {
-    console.log("mnemonic:", toMnemonicString(mnemonic))
+try {
+
+  const result = await createWorkerPool(
+    cryptoName,
+    primaryName, 
+    undefined, 
+    undefined, 
+    workerPoolStatus => { console.log(`${ workerPoolStatus.totalAttempts } guesses (${ workerPoolStatus.attemptsPerSecond }/second)`) },
+    undefined,
+    shouldGenerateMnemonic,
+    xPub
+  )
+
+  if (result === undefined) {
+    console.log("createWorkerPool returned undefined result")
+    Deno.exit()
   }
-} else if (xPub !== undefined) {
-  console.log("xpub:", xPub)
-  console.log("index:", index)
+
+  const { privateKey, publicKey, mnemonic, index } = result
+  const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
+  if (privateKey !== undefined) {
+    console.log(`private key (${ cryptoName }):`, privateKey)
+    console.log("private key hex:", displayPrivateKey(cryptoName, privateKey))
+    if (mnemonic !== undefined) {
+      console.log("mnemonic:", toMnemonicString(mnemonic))
+    }
+  } else if (xPub !== undefined) {
+    console.log("xpub:", xPub)
+    console.log("index:", index)
+  }
+  console.log(`public key (${ cryptoName }):`, publicKey)
+  console.log("public key hex:", displayPublicKey(cryptoName, publicKey))
+  console.log("primary key:", primaryKey)
+  console.log("name:", await primaryKeyToFingerprintedName(primaryKey, name))
+  console.log("fingerprint:", displayFingerprint(await primaryKeyToFingerprint(primaryKey)))
+  console.log("name key:", toNameKey(name, primaryKey))
+} catch (error) {
+  console.error(error)
+  Deno.exit()
 }
-console.log(`public key (${ cryptoName }):`, publicKey)
-console.log("public key hex:", displayPublicKey(cryptoName, publicKey))
-console.log("primary key:", primaryKey)
-console.log("name:", await primaryKeyToFingerprintedName(primaryKey, name))
-console.log("fingerprint:", displayFingerprint(await primaryKeyToFingerprint(primaryKey)))
-console.log("name key:", toNameKey(name, primaryKey))
