@@ -1,12 +1,10 @@
-import type { PrimaryChars, PrivateKey, PublicKey, CryptoName, Mnemonic, XPub } from "@vanice/types"
+import type { PrimaryChars, CryptoName, XPub } from "@vanice/types"
 import type { SuccessMessage, ProgressMessage } from "./worker.ts"
 import type { WorkerStatus } from "./Status.ts"
 import isDeno from "./lib/isDeno.ts"
+import type { KeyPair } from "./generateKeyPair.ts"
 
-export type Result = {
-  publicKey: PublicKey
-  privateKey?: PrivateKey
-  mnemonic?: Mnemonic
+export type Result = KeyPair & {
   xPub?: XPub
   index?: number
 }
@@ -68,16 +66,21 @@ export const spawnWorker = (
       worker.onmessage = (event: MessageEvent) => {
         const { success } = event.data as WorkerMessage
         if (success) {
-          const { privateKey, publicKey, mnemonic, xPub, index } = event.data as SuccessMessage
+          const { cryptoName, privateKey, privateKeyDisplay, publicKey, publicKeyDisplay, mnemonicDisplay, xPub, index } = event.data as SuccessMessage
           if (privateKey !== undefined) {
             resolve({
+              cryptoName,
               privateKey,
+              privateKeyDisplay,
               publicKey,
-              mnemonic
+              publicKeyDisplay,
+              mnemonicDisplay
             })
           } else if (xPub !== undefined && index !== undefined) {
             resolve({
+              cryptoName,
               publicKey,
+              publicKeyDisplay,
               xPub,
               index
             })

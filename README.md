@@ -24,5 +24,4 @@ deno bundle src/worker.ts --outdir dist
 
 ```
 deno lint
-deno test
 ```

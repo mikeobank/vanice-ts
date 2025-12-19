@@ -1,6 +1,4 @@
 import { 
-  displayPublicKey, 
-  displayPrivateKey, 
   isName, 
   toPrimaryName, 
   publicKeyToPrimaryKey, 
@@ -9,8 +7,7 @@ import {
   displayFingerprint, 
   toNameKey,
   isCryptoName,
-  isXPub,
-  toMnemonicString
+  isXPub
 } from "@vanice/types"
 import { getPositionalArg, getArgByName, hasArg } from "./lib/args.ts"
 import createWorkerPool from "./createWorkerPool.ts"
@@ -63,20 +60,24 @@ try {
     Deno.exit()
   }
 
-  const { privateKey, publicKey, mnemonic, index } = result
+  const { privateKey, privateKeyDisplay, publicKey, publicKeyDisplay, mnemonicDisplay, index } = result
   const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
   if (privateKey !== undefined) {
     console.log(`private key (${ cryptoName }):`, privateKey)
-    console.log("private key hex:", displayPrivateKey(cryptoName, privateKey))
-    if (mnemonic !== undefined) {
-      console.log("mnemonic:", toMnemonicString(mnemonic))
+    console.log("private key hex:", privateKeyDisplay)
+    if (mnemonicDisplay !== undefined) {
+      console.log("mnemonic:", mnemonicDisplay)
     }
   } else if (xPub !== undefined) {
     console.log("xpub:", xPub)
-    console.log("index:", index)
+    if (index === undefined) {
+      console.error("Index is undefined despite xPub being provided")
+    } else {
+      console.log("index:", index)
+    }
   }
   console.log(`public key (${ cryptoName }):`, publicKey)
-  console.log("public key hex:", displayPublicKey(cryptoName, publicKey))
+  console.log("public key hex:", publicKeyDisplay)
   console.log("primary key:", primaryKey)
   console.log("name:", await primaryKeyToFingerprintedName(primaryKey, name))
   console.log("fingerprint:", displayFingerprint(await primaryKeyToFingerprint(primaryKey)))

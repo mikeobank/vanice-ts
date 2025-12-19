@@ -1,20 +1,24 @@
 import { 
   type PrivateKey,
-  type KeyPair, 
+  type PrivateKeyDisplay,
+  type KeyPairDisplay, 
   type CryptoName, 
   type XPub, 
   generateKeyPair as generateKeyPairByCryptoName,
   derivePublicKeyFromXPub,
+  displayKey
 } from "@vanice/types"
 
-type Result = Omit<KeyPair, "privateKey"> & {
+export type KeyPair = Omit<KeyPairDisplay, "privateKey" | "privateKeyDisplay"> & {
   privateKey?: PrivateKey
+  privateKeyDisplay?: PrivateKeyDisplay
 }
 
-export const generateKeyPair = async (cryptoName: CryptoName, shouldGenerateMnemonic = false, xPub?: XPub, index?: number): Promise<Result> => {
+export const generateKeyPair = async (cryptoName: CryptoName, shouldGenerateMnemonic = false, xPub?: XPub, index?: number): Promise<KeyPair> => {
   if (xPub !== undefined && index !== undefined) {
     const publicKey = derivePublicKeyFromXPub(cryptoName, xPub, index)
-    return { cryptoName, publicKey }
+    const publicKeyDisplay = displayKey(publicKey)
+    return { cryptoName, publicKey, publicKeyDisplay }
   } else {
     return await generateKeyPairByCryptoName(cryptoName, shouldGenerateMnemonic ? 12 : undefined)
   }
