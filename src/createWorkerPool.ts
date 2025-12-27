@@ -1,5 +1,5 @@
-import type { PrimaryChars, CryptoName, XPub } from "@vanice/types"
-import { maxIndex } from "@vanice/types"
+import type { CryptoName, XPub, Name } from "@vanice/types"
+import { isCryptoName, isName, maxIndex, toPrimaryName } from "@vanice/types"
 import { type Result, spawnWorker } from "./spawnWorker.ts"
 import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
 import throttle from "./lib/throttle.ts"
@@ -9,7 +9,7 @@ type WorkerPoolStatusChangeCallback = (status: WorkerPoolStatus) => void
 
 export default (
   cryptoName: CryptoName,
-  primaryName: PrimaryChars, 
+  name: Name, 
   numWorkers = 8, 
   url?: URL,
   onWorkerPoolStatusChange?: WorkerPoolStatusChangeCallback,
@@ -17,6 +17,16 @@ export default (
   shouldGenerateMnemonic = false,
   xPub?: XPub
 ): Promise<Result | void> => {
+
+  if (isCryptoName(cryptoName) === false) { 
+    throw new Error(`Unsupported CryptoName: ${ cryptoName } (Ed25519, ECDSA, Schnorr are supported)`)
+  }
+
+  if (isName(name) === false) {
+    throw new Error(`Invalid Name: ${ name }`)
+  }
+
+  const primaryName = toPrimaryName(name)
 
   const promises: Promise<Result>[] = []
   const terminationMethods: (() => void)[] = []

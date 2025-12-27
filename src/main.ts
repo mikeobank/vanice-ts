@@ -39,14 +39,13 @@ if (xPub !== undefined && isXPub(xPub) === false) {
 }
 
 // Search string
-const primaryName = toPrimaryName(name)
-console.log(`Searching for name: ${ name } (${ primaryName })`)
+console.log(`Searching for name: ${ name } (${ toPrimaryName(name) })`)
 
 try {
 
   const result = await createWorkerPool(
     cryptoName,
-    primaryName, 
+    name, 
     undefined, 
     undefined, 
     workerPoolStatus => { console.log(`${ workerPoolStatus.totalAttempts } guesses (${ workerPoolStatus.attemptsPerSecond }/second)`) },
