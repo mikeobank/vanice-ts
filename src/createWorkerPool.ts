@@ -1,5 +1,5 @@
 import type { CryptoName, XPub, Name, FingerprintDisplay } from "@vanice/types"
-import { isCryptoName, isFingerprintDisplay, isName, maxIndex, parseFingerprint, toPrimaryName } from "@vanice/types"
+import { isCryptoName, isFingerprintDisplay, isName, maxIndex, fromFingerprintDisplay, toPrimaryName } from "@vanice/types"
 import { type Result, spawnWorker } from "./spawnWorker.ts"
 import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
 import throttle from "./lib/throttle.ts"
@@ -32,7 +32,7 @@ export default (
   }
 
   const primaryName = toPrimaryName(name)
-  const fingerprint = fingerprintDisplay ? parseFingerprint(fingerprintDisplay) : undefined
+  const fingerprint = fingerprintDisplay ? fromFingerprintDisplay(fingerprintDisplay) : undefined
 
   const promises: Promise<Result>[] = []
   const terminationMethods: (() => void)[] = []

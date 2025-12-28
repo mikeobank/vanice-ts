@@ -10,7 +10,7 @@
     "jsr:@scure/base@2.0.0": "2.0.0",
     "jsr:@scure/bip32@^2.0.1": "2.0.1",
     "jsr:@scure/bip39@^2.0.1": "2.0.1",
-    "jsr:@vanice/types@~0.2.20": "0.2.20"
+    "jsr:@vanice/types@~0.2.21": "0.2.21"
   },
   "jsr": {
     "@noble/curves@2.0.1": {
@@ -49,8 +49,8 @@
         "jsr:@scure/base"
       ]
     },
-    "@vanice/types@0.2.20": {
-      "integrity": "932f5a34f5618e4c82fa770cab1a413d0b840849352a703bfc1bba0fcb8071f7",
+    "@vanice/types@0.2.21": {
+      "integrity": "7b59c288a278caa44a71b3be831a23c89d598b8b32e398428a4b96af8a0e3081",
       "dependencies": [
         "jsr:@noble/ed25519",
         "jsr:@noble/hashes@^1.8.0",
@@ -62,7 +62,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@vanice/types@~0.2.20"
+      "jsr:@vanice/types@~0.2.21"
     ]
   }
 }

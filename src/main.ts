@@ -9,7 +9,7 @@ import {
   isCryptoName,
   isXPub,
   isFingerprintedName,
-  splitFingerprintedName
+  parseFingerprintedName
 } from "@vanice/types"
 import { getPositionalArg, getArgByName, hasArg } from "./lib/args.ts"
 import createWorkerPool from "./createWorkerPool.ts"
@@ -40,7 +40,7 @@ if (xPub !== undefined && isXPub(xPub) === false) {
 
 // Search string
 
-const [name, fingerprintDisplay] = splitFingerprintedName(nameArg)
+const [name, fingerprintDisplay] = parseFingerprintedName(nameArg)
 
 console.log(`Searching for: ${ nameArg } (${ name }, ${ toPrimaryName(name) }, ${ fingerprintDisplay })`)
 
