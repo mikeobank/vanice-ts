@@ -1,5 +1,5 @@
-import type { CryptoName, XPub, Name } from "@vanice/types"
-import { isCryptoName, isName, maxIndex, toPrimaryName } from "@vanice/types"
+import type { CryptoName, XPub, Name, FingerprintDisplay } from "@vanice/types"
+import { isCryptoName, isFingerprintDisplay, isName, maxIndex, parseFingerprint, toPrimaryName } from "@vanice/types"
 import { type Result, spawnWorker } from "./spawnWorker.ts"
 import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
 import throttle from "./lib/throttle.ts"
@@ -10,6 +10,7 @@ type WorkerPoolStatusChangeCallback = (status: WorkerPoolStatus) => void
 export default (
   cryptoName: CryptoName,
   name: Name, 
+  fingerprintDisplay?: FingerprintDisplay,
   numWorkers = 8, 
   url?: URL,
   onWorkerPoolStatusChange?: WorkerPoolStatusChangeCallback,
@@ -26,7 +27,12 @@ export default (
     throw new Error(`Invalid Name: ${ name }`)
   }
 
+  if (fingerprintDisplay !== undefined && isFingerprintDisplay(fingerprintDisplay) === false) {
+    throw new Error(`Invalid Fingerprint: ${ fingerprintDisplay }`)
+  }
+
   const primaryName = toPrimaryName(name)
+  const fingerprint = fingerprintDisplay ? parseFingerprint(fingerprintDisplay) : undefined
 
   const promises: Promise<Result>[] = []
   const terminationMethods: (() => void)[] = []
@@ -54,6 +60,7 @@ export default (
       cryptoName, 
       i, 
       primaryName, 
+      fingerprint,
       url, 
       statusChangeCallback, 
       shouldGenerateMnemonic,

@@ -1,11 +1,13 @@
-import { type XPub, publicKeyToPrimaryKey } from "@vanice/types"
+import { type XPub, publicKeyToFingerprint, publicKeyToPrimaryKey } from "@vanice/types"
 import { type KeyPair, generateKeyPair } from "./generateKeyPair.ts"
+import equalArrays from "./lib/utils/equalArrays.ts";
 
 export type SuccessMessage = KeyPair & {
   success: true
   xPub?: XPub
   index?: number
 }
+
 export type FailureMessage = {
   success: false
   totalAttempts: number
@@ -21,8 +23,9 @@ const worker = self as unknown as Worker
 
 worker.onmessage = async (event: MessageEvent) => {
 
-  const { search, cryptoName, shouldGenerateMnemonic, xPub, offset, maxAttempts } = event.data
-  const searchLength = search.length
+  const { primaryName, fingerprint, cryptoName, shouldGenerateMnemonic, xPub, offset, maxAttempts } = event.data
+  const searchLength = primaryName.length
+  const fingerprintLength = fingerprint?.length
 
   let match = false
   let totalAttempts = 0
@@ -33,7 +36,13 @@ worker.onmessage = async (event: MessageEvent) => {
     const { publicKey } = keyPair
     const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
     const value = primaryKey.substring(0, searchLength)
-    if (value === search) {
+    const isNameMatch = value === primaryName
+    let isFingerprintMatch = true
+    if (fingerprint !== undefined) {
+      const fullFingerprint = await publicKeyToFingerprint(publicKey)
+      isFingerprintMatch = equalArrays(fullFingerprint.slice(0, fingerprintLength), fingerprint)
+    }
+    if (isNameMatch && isFingerprintMatch) {
       worker.postMessage({
         success: true,
         ...keyPair,

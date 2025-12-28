@@ -7,24 +7,24 @@ import {
   displayFingerprint, 
   toNameKey,
   isCryptoName,
-  isXPub
+  isXPub,
+  isFingerprintedName,
+  splitFingerprintedName
 } from "@vanice/types"
 import { getPositionalArg, getArgByName, hasArg } from "./lib/args.ts"
 import createWorkerPool from "./createWorkerPool.ts"
 
-const name = getPositionalArg(Deno.args)
+const nameArg = getPositionalArg(Deno.args)
 const cryptoName = getArgByName("crypto", Deno.args, "Schnorr")
 const xPub = getArgByName("xpub", Deno.args)
 const shouldGenerateMnemonic = hasArg("mnemonic", Deno.args)
 
-console.log(shouldGenerateMnemonic)
-
-if (name === undefined) {
+if (nameArg === undefined) {
   console.error("No name provided")
   Deno.exit()
 }
-if (isName(name) === false) {
-  console.error(`Invalid characters in name: ${ name }`)
+if (isName(nameArg) === false && isFingerprintedName(nameArg) === false) {
+  console.error(`Invalid Name or FingerprintedName: ${ nameArg }`)
   Deno.exit()
 }
 
@@ -39,17 +39,25 @@ if (xPub !== undefined && isXPub(xPub) === false) {
 }
 
 // Search string
-console.log(`Searching for name: ${ name } (${ toPrimaryName(name) })`)
+
+const [name, fingerprintDisplay] = splitFingerprintedName(nameArg)
+
+console.log(`Searching for: ${ nameArg } (${ name }, ${ toPrimaryName(name) }, ${ fingerprintDisplay })`)
+
+const numWorkers = undefined
+const url = undefined
+const throttleLimit = undefined
 
 try {
 
   const result = await createWorkerPool(
     cryptoName,
     name, 
-    undefined, 
-    undefined, 
+    fingerprintDisplay,
+    numWorkers, 
+    url, 
     workerPoolStatus => { console.log(`${ workerPoolStatus.totalAttempts } guesses (${ workerPoolStatus.attemptsPerSecond }/second)`) },
-    undefined,
+    throttleLimit,
     shouldGenerateMnemonic,
     xPub
   )

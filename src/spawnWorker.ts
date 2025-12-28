@@ -1,4 +1,4 @@
-import type { PrimaryChars, CryptoName, XPub } from "@vanice/types"
+import type { PrimaryChars, CryptoName, XPub, Fingerprint } from "@vanice/types"
 import type { SuccessMessage, ProgressMessage } from "./worker.ts"
 import type { WorkerStatus } from "./Status.ts"
 import isDeno from "./lib/isDeno.ts"
@@ -20,9 +20,10 @@ const defaultUrl = new URL(isDeno ? "./worker.ts" : "/worker.js", import.meta.ur
 export const spawnWorker = (
   cryptoName: CryptoName,
   id: WorkerStatus["workerId"], 
-  search: PrimaryChars, 
+  primaryName: PrimaryChars, 
+  fingerprint?: Fingerprint,
   url: URL = defaultUrl,
-  onStatusChange: StatusChangeCallback,
+  onStatusChange: StatusChangeCallback = () => {},
   shouldGenerateMnemonic = false,
   xPub?: XPub,
   offset?: number,
@@ -96,7 +97,7 @@ export const spawnWorker = (
         }
       }
 
-      worker.postMessage({ cryptoName, search, shouldGenerateMnemonic, xPub, offset, maxAttempts })
+      worker.postMessage({ cryptoName, primaryName, fingerprint, shouldGenerateMnemonic, xPub, offset, maxAttempts })
       return worker
     }
 
