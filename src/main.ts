@@ -9,7 +9,7 @@ import {
   isCryptoName,
   isXPub,
   isFingerprintedName,
-  parseFingerprintedName
+  parseName
 } from "@vanice/types"
 import { getPositionalArg, getArgByName, hasArg } from "./lib/args.ts"
 import createWorkerPool from "./createWorkerPool.ts"
@@ -40,7 +40,7 @@ if (xPub !== undefined && isXPub(xPub) === false) {
 
 // Search string
 
-const [name, fingerprintDisplay] = parseFingerprintedName(nameArg)
+const [name, fingerprintDisplay] = parseName(nameArg)
 
 console.log(`Searching for: ${ nameArg } (${ name }, ${ toPrimaryName(name) }, ${ fingerprintDisplay })`)
 
@@ -50,7 +50,7 @@ const throttleLimit = undefined
 
 try {
 
-  const result = await createWorkerPool(
+  const { promise, abort } = createWorkerPool(
     cryptoName,
     name, 
     fingerprintDisplay,
@@ -62,6 +62,14 @@ try {
     xPub
   )
 
+  // Clean up
+  Deno.addSignalListener("SIGINT", () => {
+    abort()
+    Deno.exit()
+  })
+
+  const result = await promise
+
   if (result === undefined) {
     console.log("createWorkerPool returned undefined result")
     Deno.exit()
@@ -69,6 +77,11 @@ try {
 
   const { privateKey, privateKeyDisplay, publicKey, publicKeyDisplay, mnemonicDisplay, index } = result
   const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
+  const [fingerprintedName] = await primaryKeyToFingerprintedName(primaryKey, name)
+
+  console.log("\nName found!\n")
+  console.log("fingerprinted name:", fingerprintedName)
+
   if (privateKey !== undefined) {
     console.log(`private key (${ cryptoName }):`, privateKey)
     console.log("private key hex:", privateKeyDisplay)
@@ -83,10 +96,11 @@ try {
       console.log("index:", index)
     }
   }
+
   console.log(`public key (${ cryptoName }):`, publicKey)
   console.log("public key hex:", publicKeyDisplay)
   console.log("primary key:", primaryKey)
-  console.log("name:", await primaryKeyToFingerprintedName(primaryKey, name))
+  console.log("name:", name)
   console.log("fingerprint:", displayFingerprint(await primaryKeyToFingerprint(primaryKey)))
   console.log("name key:", toNameKey(name, primaryKey))
 } catch (error) {

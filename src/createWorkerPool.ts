@@ -3,7 +3,6 @@ import { isCryptoName, isFingerprintDisplay, isName, maxIndex, fromFingerprintDi
 import { type Result, spawnWorker } from "./spawnWorker.ts"
 import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
 import throttle from "./lib/throttle.ts"
-import isDeno from "./lib/isDeno.ts"
 
 type WorkerPoolStatusChangeCallback = (status: WorkerPoolStatus) => void
 
@@ -17,7 +16,7 @@ export default (
   throttleLimit = 1000,
   shouldGenerateMnemonic = false,
   xPub?: XPub
-): Promise<Result | void> => {
+): { promise: Promise<Result | void>, abort: () => void } => {
 
   if (isCryptoName(cryptoName) === false) { 
     throw new Error(`Unsupported CryptoName: ${ cryptoName } (Ed25519, ECDSA, Schnorr are supported)`)
@@ -73,24 +72,34 @@ export default (
     terminationMethods.push(terminationMethod)
   }
 
-  // Clean up workers on process exit
-  if (isDeno) {
-    Deno.addSignalListener("SIGINT", () => {
-      console.log("Terminating all workers...")
+  const abortController = new AbortController()
+  const { signal } = abortController
+
+  const abortPromise = new Promise<never>((_, reject) => {
+    signal.addEventListener("abort", () => {
       terminateAll()
-      Deno.exit()
+      reject(signal.reason ?? new Error("Aborted"))
     })
+  })
+
+  const abort = () => {
+    abortController.abort()
   }
 
-  return Promise.any(promises).then(result => {
-    // Terminate all other workers
-    terminateAll()
-    return result
-  }).catch(() => {
-    if (xPub !== undefined) {
-      throw new Error("XPub derivation exhausted")
-    } else {
-      throw new Error("All workers failed")
-    }
-  })
+  const promise = Promise.race([
+    Promise.any(promises).then(result => {
+      // Terminate all other workers
+      terminateAll()
+      return result
+    }).catch(() => {
+      if (xPub !== undefined) {
+        throw new Error("XPub derivation exhausted")
+      } else {
+        throw new Error("All workers failed")
+      }
+    }),
+    abortPromise
+  ])
+
+  return { promise, abort }
 }
