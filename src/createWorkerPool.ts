@@ -78,7 +78,7 @@ export default (
   const abortPromise = new Promise<never>((_, reject) => {
     signal.addEventListener("abort", () => {
       terminateAll()
-      reject(signal.reason ?? new Error("Aborted"))
+      reject()
     })
   })
 
