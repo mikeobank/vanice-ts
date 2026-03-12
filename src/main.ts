@@ -9,7 +9,8 @@ import {
   isCryptoName,
   isXPub,
   isFingerprintedName,
-  parseName
+  parseName,
+  isMnemonicPassphrase
 } from "@vanice/types"
 import { getPositionalArg, getArgByName, hasArg } from "./lib/args.ts"
 import createWorkerPool from "./createWorkerPool.ts"
@@ -22,21 +23,26 @@ const shouldGenerateMnemonic = hasArg("mnemonic", Deno.args) || passphrase !== u
 
 if (nameArg === undefined) {
   console.error("No name provided")
-  Deno.exit()
+  Deno.exit(1)
 }
 if (isName(nameArg) === false && isFingerprintedName(nameArg) === false) {
   console.error(`Invalid Name or FingerprintedName: ${ nameArg }`)
-  Deno.exit()
+  Deno.exit(1)
 }
 
 if (isCryptoName(cryptoName) === false) {
   console.error(`Unsupported crypto name: ${ cryptoName } (Ed25519, ECDSA, Schnorr are supported)`)
-  Deno.exit()
+  Deno.exit(1)
 }
 
 if (xPub !== undefined && isXPub(xPub) === false) {
   console.error(`Invalid XPub: ${ xPub }`)
-  Deno.exit()
+  Deno.exit(1)
+}
+
+if (isMnemonicPassphrase(passphrase) === false) {
+  console.error(`Invalid passphrase: ${ passphrase } (must be a non empty string)`)
+  Deno.exit(1)
 }
 
 // Search string
@@ -73,8 +79,8 @@ try {
   const result = await promise
 
   if (result === undefined) {
-    console.log("createWorkerPool returned undefined result")
-    Deno.exit()
+    console.error("createWorkerPool returned undefined result")
+    Deno.exit(1)
   }
 
   const { privateKey, privateKeyDisplay, publicKey, publicKeyDisplay, mnemonicDisplay, index } = result
@@ -110,5 +116,5 @@ try {
   console.log("name key:", toNameKey(name, primaryKey))
 } catch (error) {
   console.error(error)
-  Deno.exit()
+  Deno.exit(1)
 }

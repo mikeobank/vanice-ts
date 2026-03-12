@@ -80,7 +80,7 @@ export default (
   const abortPromise = new Promise<never>((_, reject) => {
     signal.addEventListener("abort", () => {
       terminateAll()
-      reject()
+      reject(new DOMException("Aborted", "AbortError"))
     })
   })
 

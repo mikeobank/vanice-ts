@@ -10,7 +10,7 @@
     "jsr:@scure/base@2.0.0": "2.0.0",
     "jsr:@scure/bip32@^2.0.1": "2.0.1",
     "jsr:@scure/bip39@^2.0.1": "2.0.1",
-    "jsr:@vanice/types@~0.2.43": "0.2.43",
+    "jsr:@vanice/types@~0.2.44": "0.2.44",
     "npm:ajv@^8.17.0": "8.18.0",
     "npm:ses@^1.15.0": "1.15.0"
   },
@@ -51,8 +51,8 @@
         "jsr:@scure/base"
       ]
     },
-    "@vanice/types@0.2.43": {
-      "integrity": "0b9d90e0b37d9c976821e87a104b56387b277e356a623a6435fcf585457a22e8",
+    "@vanice/types@0.2.44": {
+      "integrity": "ac091f915ea0d26c305418ab246814c4cd1a706f54a3cfabb4453a6c665c1523",
       "dependencies": [
         "jsr:@noble/ed25519",
         "jsr:@noble/hashes@^1.8.0",
@@ -106,7 +106,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@vanice/types@~0.2.43"
+      "jsr:@vanice/types@~0.2.44"
     ]
   }
 }
