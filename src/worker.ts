@@ -23,7 +23,7 @@ const worker = self as unknown as Worker
 
 worker.onmessage = async (event: MessageEvent) => {
 
-  const { primaryName, fingerprint, cryptoName, shouldGenerateMnemonic, mnemonicPassphrase, xPub, offset, maxAttempts } = event.data
+  const { primaryName, fingerprint, cryptoName, shouldGenerateMnemonic, mnemonicPassphrase, xPub, offset = 0, maxAttempts } = event.data
   const searchLength = primaryName.length
   const fingerprintLength = fingerprint?.length
 
