@@ -11,7 +11,7 @@ deno compile --output vanice --include ./src/worker.ts ./src/main.ts
 ## Run
 
 ```
-deno run --allow-read src/main.ts { vanity name }
+deno run --allow-read --allow-env src/main.ts { vanity name }
 ./vanice { vanity name }
 ```
 
