@@ -1,4 +1,4 @@
-import type { CryptoName, XPub, Name, FingerprintDisplay } from "@vanice/types"
+import type { CryptoName, XPub, Name, FingerprintDisplay, MnemonicPassphrase } from "@vanice/types"
 import { isCryptoName, isFingerprintDisplay, isName, maxIndex, fromFingerprintDisplay, toPrimaryName } from "@vanice/types"
 import { type Result, spawnWorker } from "./spawnWorker.ts"
 import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
@@ -15,6 +15,7 @@ export default (
   onWorkerPoolStatusChange?: WorkerPoolStatusChangeCallback,
   throttleLimit = 1000,
   shouldGenerateMnemonic = false,
+  mnemonicPassphrase?: MnemonicPassphrase,
   xPub?: XPub
 ): { promise: Promise<Result | void>, abort: () => void } => {
 
@@ -63,6 +64,7 @@ export default (
       url, 
       statusChangeCallback, 
       shouldGenerateMnemonic,
+      mnemonicPassphrase,
       xPub, 
       maxAttemptsPerWorker, 
       offset

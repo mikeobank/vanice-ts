@@ -1,4 +1,4 @@
-import type { PrimaryChars, CryptoName, XPub, Fingerprint } from "@vanice/types"
+import type { PrimaryChars, CryptoName, XPub, Fingerprint, MnemonicPassphrase } from "@vanice/types"
 import type { SuccessMessage, ProgressMessage } from "./worker.ts"
 import type { WorkerStatus } from "./Status.ts"
 import isDeno from "./lib/isDeno.ts"
@@ -25,6 +25,7 @@ export const spawnWorker = (
   url: URL = defaultUrl,
   onStatusChange: StatusChangeCallback = () => {},
   shouldGenerateMnemonic = false,
+  mnemonicPassphrase?: MnemonicPassphrase,
   xPub?: XPub,
   offset?: number,
   maxAttempts?: number
@@ -97,7 +98,7 @@ export const spawnWorker = (
         }
       }
 
-      worker.postMessage({ cryptoName, primaryName, fingerprint, shouldGenerateMnemonic, xPub, offset, maxAttempts })
+      worker.postMessage({ cryptoName, primaryName, fingerprint, shouldGenerateMnemonic, mnemonicPassphrase, xPub, offset, maxAttempts })
       return worker
     }
 

@@ -17,7 +17,8 @@ import createWorkerPool from "./createWorkerPool.ts"
 const nameArg = getPositionalArg(Deno.args)
 const cryptoName = getArgByName("crypto", Deno.args, "Schnorr")
 const xPub = getArgByName("xpub", Deno.args)
-const shouldGenerateMnemonic = hasArg("mnemonic", Deno.args)
+const passphrase = getArgByName("passphrase", Deno.args)
+const shouldGenerateMnemonic = hasArg("mnemonic", Deno.args) || passphrase !== undefined
 
 if (nameArg === undefined) {
   console.error("No name provided")
@@ -59,6 +60,7 @@ try {
     workerPoolStatus => { console.log(`${ workerPoolStatus.totalAttempts } guesses (${ workerPoolStatus.attemptsPerSecond }/second)`) },
     throttleLimit,
     shouldGenerateMnemonic,
+    passphrase,
     xPub
   )
 
@@ -87,6 +89,9 @@ try {
     console.log("private key hex:", privateKeyDisplay)
     if (mnemonicDisplay !== undefined) {
       console.log("mnemonic:", mnemonicDisplay)
+    }
+    if (passphrase !== undefined) {
+      console.log("passphrase:", passphrase)
     }
   } else if (xPub !== undefined) {
     console.log("xpub:", xPub)

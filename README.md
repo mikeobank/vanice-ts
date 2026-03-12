@@ -5,7 +5,7 @@ Typescript implementation for https://github.com/mikeobank/vanice
 ## Compile
 
 ```
-deno compile --output vanice --include ./src/worker.ts ./src/main.ts
+deno compile --allow-env --output vanice --include ./src/worker.ts ./src/main.ts
 ```
 
 ## Run

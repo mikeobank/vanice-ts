@@ -23,7 +23,7 @@ const worker = self as unknown as Worker
 
 worker.onmessage = async (event: MessageEvent) => {
 
-  const { primaryName, fingerprint, cryptoName, shouldGenerateMnemonic, xPub, offset, maxAttempts } = event.data
+  const { primaryName, fingerprint, cryptoName, shouldGenerateMnemonic, mnemonicPassphrase, xPub, offset, maxAttempts } = event.data
   const searchLength = primaryName.length
   const fingerprintLength = fingerprint?.length
 
@@ -32,7 +32,7 @@ worker.onmessage = async (event: MessageEvent) => {
 
   while (match === false) {
     const index = offset + totalAttempts 
-    const keyPair = await generateKeyPair(cryptoName, shouldGenerateMnemonic, xPub, index) 
+    const keyPair = await generateKeyPair(cryptoName, shouldGenerateMnemonic, mnemonicPassphrase, xPub, index) 
     const { publicKey } = keyPair
     const primaryKey = publicKeyToPrimaryKey(cryptoName, publicKey)
     const value = primaryKey.substring(0, searchLength)
