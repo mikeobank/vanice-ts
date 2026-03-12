@@ -47,6 +47,9 @@ export const spawnWorker = (
     }
   }
 
+  const MAX_RESPAWNS = 12
+  let respawnCount = 0
+
   return [status, new Promise((resolve, reject) => {
 
     const spawnNewWorker = () => {
@@ -60,6 +63,11 @@ export const spawnWorker = (
         status.errors.push({ datetime: Date.now(), error })
         onStatusChange(status)
         terminate()
+        if (respawnCount >= MAX_RESPAWNS) {
+          reject(new Error(`Worker ${ displayNum(id) } failed ${ MAX_RESPAWNS } times and will not be respawned.`))
+          return
+        }
+        respawnCount++
         setTimeout(() => {
           workerInstance = spawnNewWorker()
         }, 1000)
