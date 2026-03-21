@@ -1,6 +1,6 @@
 import { type XPub, publicKeyToFingerprint, publicKeyToPrimaryKey } from "@vanice/types"
 import { type KeyPair, generateKeyPair } from "./generateKeyPair.ts"
-import equalArrays from "./lib/utils/equalArrays.ts";
+import equalArrays from "./lib/utils/equalArrays.ts"
 
 export type SuccessMessage = KeyPair & {
   success: true
