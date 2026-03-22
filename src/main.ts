@@ -40,7 +40,7 @@ if (xPub !== undefined && isXPub(xPub) === false) {
   Deno.exit(1)
 }
 
-if (isMnemonicPassphrase(passphrase) === false) {
+if (passphrase !== undefined && isMnemonicPassphrase(passphrase) === false) {
   console.error(`Invalid passphrase: ${ passphrase } (must be a non empty string)`)
   Deno.exit(1)
 }
