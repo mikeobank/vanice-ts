@@ -84,7 +84,8 @@ export const spawnWorker = (
               privateKeyDisplay,
               publicKey,
               publicKeyDisplay,
-              mnemonicDisplay
+              mnemonicDisplay,
+              mnemonicPassphrase
             })
           } else if (xPub !== undefined && index !== undefined) {
             resolve({
