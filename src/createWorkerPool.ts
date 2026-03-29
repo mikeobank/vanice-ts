@@ -1,8 +1,21 @@
-import type { CryptoName, XPub, Name, FingerprintDisplay, MnemonicPassphrase } from "@vanice/types"
-import { isCryptoName, isFingerprintDisplay, isName, maxIndex, fromFingerprintDisplay, toPrimaryName } from "@vanice/types"
+import type { CryptoName, XPub, Name, FingerprintDisplay, MnemonicPassphrase, NameKey } from "@vanice/types"
+import { isCryptoName, isFingerprintDisplay, isName, maxIndex, fromFingerprintDisplay, toPrimaryName, publicKeyToPrimaryKey, toNameKey } from "@vanice/types"
 import { type Result, spawnWorker } from "./spawnWorker.ts"
 import { type WorkerPoolStatus, type WorkerStatus, createWorkerPoolStatus, updateWorkerPoolStatus } from "./Status.ts"
 import throttle from "./lib/throttle.ts"
+
+type WorkerPoolResult = Result & {
+  nameKey: NameKey
+}
+
+const createWorkerPoolResult = (name: Name, result: Result): WorkerPoolResult => {
+  const primaryKey = publicKeyToPrimaryKey(result.cryptoName, result.publicKey)
+  const nameKey = toNameKey(name, primaryKey)
+  return {
+    ...result,
+    nameKey
+  }
+}
 
 type WorkerPoolStatusChangeCallback = (status: WorkerPoolStatus) => void
 
@@ -17,7 +30,7 @@ export default (
   shouldGenerateMnemonic = false,
   mnemonicPassphrase?: MnemonicPassphrase,
   xPub?: XPub
-): { promise: Promise<Result | void>, abort: () => void } => {
+): { promise: Promise<WorkerPoolResult | void>, abort: () => void } => {
 
   if (isCryptoName(cryptoName) === false) { 
     throw new Error(`Unsupported CryptoName: ${ cryptoName } (Ed25519, ECDSA, Schnorr are supported)`)
@@ -92,7 +105,7 @@ export default (
     Promise.any(promises).then(result => {
       // Terminate all other workers
       terminateAll()
-      return result
+      return createWorkerPoolResult(name, result)
     }).catch(() => {
       if (xPub !== undefined) {
         throw new Error("XPub derivation exhausted")
